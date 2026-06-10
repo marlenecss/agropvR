@@ -24,3 +24,5 @@ Imports:
     sf,
     terra,
     tidyr
+URL: https://github.com/marlenecss/agropvR
+BugReports: https://github.com/marlenecss/agropvR/issues
