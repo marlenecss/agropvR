@@ -1,0 +1,10 @@
+.Rproj.user
+*.tif
+cache/
+*.tif
+*.jp2
+.Rhistory
+.RData
+.httr-oauth
+.DS_Store
+.quarto

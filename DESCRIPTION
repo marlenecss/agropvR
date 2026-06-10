@@ -1,0 +1,26 @@
+Package: agropvR
+Title: Tools for Mapping Environmental Impacts of Agrophotovoltaics
+Version: 0.0.0.9000
+Authors@R:
+    person("Marlene", "Sehrbrock", , "first.last@example.com", role = c("aut", "cre"))
+Description: AgropvR uses Sentinel 2 imagery from 2024 (April to October) to calculate NDVI, NDMI and BSI for 25 sites across Baden-Wuerttemberg. Each site contains a site with an agrophotoltaic sstem on it, and an agricultural reference field. Statistics are extracted and the final result is a map displaying the three indices for a selected month.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+LazyData: true
+Imports: 
+    dplyr,
+    exactextractr,
+    ggplot2,
+    lubridate,
+    patchwork,
+    rlang,
+    rnaturalearth,
+    rnaturalearthdata,
+    rstac,
+    sf,
+    terra,
+    tidyr
