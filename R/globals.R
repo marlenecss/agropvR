@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "setNames",
     "x", "y",
     "lon", "lat",
     "label",

@@ -3,15 +3,9 @@
 \name{collect_site_data}
 \alias{collect_site_data}
 \title{COLLECT SITE DATA
-Download and cache all monthly data for one agrovoltaic site}
+Download and cache data for one agrovoltaic site and one month}
 \usage{
-collect_site_data(
-  site_sf,
-  field_sf,
-  site_id,
-  cache_dir = "data/cache",
-  months = c(paste0("2024-0", 4:9), "2024-10")
-)
+collect_site_data(site_sf, field_sf, site_id, month, cache_dir = "cache")
 }
 \arguments{
 \item{site_sf}{polygon of the agrovoltaic facility}
@@ -20,13 +14,13 @@ collect_site_data(
 
 \item{site_id}{label used for cache filenames}
 
-\item{cache_dir}{path to folder for .rds files (default "data/cache")}
+\item{month}{character string "YYYY-MM", e.g. "2024-07"}
 
-\item{months}{vector of "YYYY-MM" strings; defaults to Apr–Oct 2024}
+\item{cache_dir}{path to folder where .rds files are saved (default "data/cache")}
 }
 \value{
-invisible NULL; results are saved to cache_dir as .rds files
+invisible NULL; result is saved to cache_dir as an .rds file
 }
 \description{
-Loops April to October automatically. Safe to re-run — skips already cached months.
+Safe to re-run — skips if that month is already cached.
 }

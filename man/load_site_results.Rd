@@ -5,7 +5,7 @@
 \title{LOAD SITE RESULTS
 Load cached results for a site, optionally filtering by month}
 \usage{
-load_site_results(site_id, months = NULL, cache_dir = "data/cache")
+load_site_results(site_id, months = NULL, cache_dir = "cache")
 }
 \arguments{
 \item{site_id}{site identifier matching the one used in collect_site_data()}

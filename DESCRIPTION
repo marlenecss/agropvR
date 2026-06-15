@@ -12,10 +12,13 @@ Depends:
     R (>= 3.5)
 LazyData: true
 Imports: 
+    cowplot,
     dplyr,
     exactextractr,
     ggplot2,
+    httr,
     lubridate,
+    maptiles,
     patchwork,
     rlang,
     rnaturalearth,
@@ -23,6 +26,7 @@ Imports:
     rstac,
     sf,
     terra,
-    tidyr
+    tidyr,
+    tidyterra
 URL: https://github.com/marlenecss/agropvR
 BugReports: https://github.com/marlenecss/agropvR/issues

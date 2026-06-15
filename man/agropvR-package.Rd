@@ -8,6 +8,14 @@
 \description{
 An R package to map the environmental impact of agrophotovoltaics across Baden-Wuerttemberg and Bavaria.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/marlenecss/agropvR}
+  \item Report bugs at \url{https://github.com/marlenecss/agropvR/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Marlene Sehrbrock \email{first.last@example.com}
 

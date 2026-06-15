@@ -8,6 +8,7 @@ Map NDVI, NDMI, and BSI for one agrovoltaic site and month}
 map_indices(
   site_id,
   month,
+  cache_dir = "cache",
   sites_sf = agropvR::sites,
   fields_sf = agropvR::fields
 )
@@ -16,6 +17,8 @@ map_indices(
 \item{site_id}{site identifier}
 
 \item{month}{character string "YYYY-MM", e.g. "2024-07"}
+
+\item{cache_dir}{path to cache folder (default "data/cache")}
 
 \item{sites_sf}{the sites sf object included in the package (sites)}
 

@@ -1,62 +1,83 @@
 #' COLLECT SITE DATA
-#' Download and cache all monthly data for one agrovoltaic site
+#' Download and cache data for one agrovoltaic site and one month
 #'
-#' Loops April to October automatically. Safe to re-run — skips already cached months.
+#' Safe to re-run — skips if that month is already cached.
 #'
 #' @param site_sf polygon of the agrovoltaic facility
 #' @param field_sf polygon of the paired reference field
 #' @param site_id label used for cache filenames
-#' @param cache_dir path to folder for .rds files (default "data/cache")
-#' @param months vector of "YYYY-MM" strings; defaults to Apr–Oct 2024
-#' @return invisible NULL; results are saved to cache_dir as .rds files
+#' @param month character string "YYYY-MM", e.g. "2024-07"
+#' @param cache_dir path to folder where .rds files are saved (default "data/cache")
+#' @return invisible NULL; result is saved to cache_dir as an .rds file
 #' @export
 collect_site_data <- function(site_sf,
                               field_sf,
                               site_id,
-                              cache_dir = "data/cache",
-                              months = c(paste0("2024-0", 4:9), "2024-10")) {
+                              month,
+                              cache_dir = "cache") {
 
-  # create cache folder if it doesn't exist
   dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
-  # buffer around field (not site) for imagery download
   buffer_sf <- sf::st_buffer(
     sf::st_transform(field_sf, 25832),
     dist = 300
   )
 
-  # loop over months
-  for (m in months) {
-    label    <- paste0("site_", site_id, "_", m)
-    cache_fp <- file.path(cache_dir, paste0(label, ".rds"))
+  label    <- paste0("site_", site_id, "_", month)
+  cache_fp <- file.path(cache_dir, paste0(label, ".rds"))
+  tif_fp   <- file.path(cache_dir, paste0(label, ".tif"))
 
-    # skip if already cached
-    if (file.exists(cache_fp)) {
-      message("Already cached: ", label)
-      next
+  # skip if both files already exist
+  if (file.exists(cache_fp) && file.exists(tif_fp)) {
+    message("Already cached: ", label)
+    return(invisible(NULL))
+  }
+
+  message("Processing: ", label)
+
+  # find scene
+  scene <- search_sentinel(site_sf, month)
+
+  if (is.null(scene)) {
+    message("  FAILED: no suitable scene found")
+    return(invisible(NULL))
+  }
+
+  # download bands
+  bands <- tryCatch(
+    load_bands(scene, buffer_sf),
+    error = function(e) {
+      message("  FAILED: ", conditionMessage(e))
+      NULL
     }
+  )
 
-    message("Processing: ", label)
+  if (is.null(bands)) return(invisible(NULL))
 
+  # compute indices
+  indices <- calc_indices(bands)
+
+  # save raster .tif
+  if (!file.exists(tif_fp)) {
+    terra::writeRaster(indices, tif_fp, overwrite = TRUE)
+    message("  Saved raster: ", tif_fp)
+  }
+
+  # save statistics .rds
+  if (!file.exists(cache_fp)) {
     result <- tryCatch(
-      compare_site(
-        site_sf   = site_sf,
-        field_sf  = field_sf,
-        buffer_sf = buffer_sf,
-        month     = m
-      ),
+      extract_stats(indices, site_sf, field_sf, month),
       error = function(e) {
-        message("  FAILED: ", conditionMessage(e))
+        message("  FAILED extracting stats: ", conditionMessage(e))
         NULL
       }
     )
 
-    # save result if successful
     if (!is.null(result)) {
       result$site_id <- site_id
-      result$month   <- m
+      result$month   <- month
       saveRDS(result, cache_fp)
-      message("  Saved: ", cache_fp)
+      message("  Saved stats: ", cache_fp)
     }
   }
 

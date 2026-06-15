@@ -8,7 +8,7 @@
 #' @export
 load_site_results <- function(site_id,
                               months = NULL,
-                              cache_dir = "data/cache") {
+                              cache_dir = "cache") {
 
   all_months <- c(paste0("2024-0", 4:9), "2024-10")
   selected   <- if (is.null(months)) all_months else months
