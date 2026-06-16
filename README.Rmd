@@ -42,74 +42,95 @@ head(sites)
 head(fields)
 ```
 
-# ============================================
-# agropvR — complete workflow
-# ============================================
+## Workflow
 
 ## SETUP
-# install.packages("devtools")
+```r
+install.packages("devtools")
 devtools::install_github("marlenecss/agropvR")
 library(agropvR)
+```
 
 ## STEP 1 — download pre-computed cache from Zenodo
-# downloads all pre-computed .rds and .tif files
-# only needs to be run once — skips files already present
-# requires internet connection and some disk space
+downloads all pre-computed .rds and .tif files
+only needs to be run once — skips files already present
+requires internet connection and some disk space
+```r
 download_cache()
+```
 
 ## STEP 2 - check which sites and months are available
-# limited due to 30% cloud cover
+limited due to 30% cloud cover
+```r
 available_sites()
+```
 
 ## STEP 3 — load results for a site
-# replace site_id number with site of choice
-# replace site_id number in subsequent functions
+replace site_id number with site of choice
+replace site_id number in subsequent functions
+```r
 results <- load_site_results(site_id = 1)
+```
 
-# or load specific months only
+or load specific months only
+```r
 results <- load_site_results(
   site_id = 1,
   months  = c("2024-06", "2024-07", "2024-08")
 )
+```
 
-# STEP 4 — plot index time series
-# compares NDVI, NDMI and BSI between the
-# agrovoltaic site and its paired reference field
-# shaded band = mean +/- 1 standard deviation
+## STEP 4 — plot index time series
+compares NDVI, NDMI and BSI between the
+agrovoltaic site and its paired reference field
+shaded band = mean +/- 1 standard deviation
+```r
 plot_indices(results, site_id = 1)
+```
 
-# STEP 5 — map indices spatially
+## STEP 5 — map indices spatially
 # maps all three indices side by side for one site and month
 # loads from local cache — no download needed after Step 1
+```r
 map_indices(site_id = 1, month = "2024-07")
+```
 
-# STEP 6 — compare system types
+## STEP 6 — compare system types
 # compares overhead vs interspace agrovoltaic systems
 # load results from multiple sites and combine them
+```r
 results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 1),
   load_site_results(site_id = 2),
   load_site_results(site_id = 3)
   # add more sites as needed, up to 25
 )
+```
 
 # summary table: mean and SD per index per system type
+```r
 compare_system_types(results_multi)
+```
 
 # bar chart comparing system types across all three indices
+```r
 plot_system_types(results_multi)
+```
 
 ## OPTIONAL — collect data for a missing site/month
 # instead of this
+```r
 collect_site_data(
   site_sf   = sites[1, ],
   field_sf  = fields[1, ],
   site_id   = 1,
   month     = "2024-05"
 )
+```
 
 # you could try raising the cloud cover threshold
 # use with caution as cloudy scenes affect index quality
+```r
 collect_site_data(
   site_sf   = sites[1, ],
   field_sf  = fields[1, ],
@@ -117,7 +138,9 @@ collect_site_data(
   month     = "2024-05",
   max_cloud = 50
 )
+```
 # or look for data in 2025
+```r
 collect_site_data(
  site_sf = sites[1, ],
  field_sf = fields[1, ],
@@ -125,7 +148,7 @@ collect_site_data(
  month = "2025-04",
  max_cloud = 30
 )
-
+```
 
 ## Notes
 
