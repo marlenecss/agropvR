@@ -41,77 +41,152 @@ head(sites)
 head(fields)
 ```
 
-## Workflow
+# ============================================
 
-### Step 1 — collect data for a site and month
+# agropvR — complete workflow
 
-Download and cache Sentinel-2 imagery for one site and one month at a
-time. This may take several minutes for each image. Results are saved
-locally so the download only happens once per site/month combination.
+# ============================================
+
+## SETUP
+
+# install.packages(“devtools”)
 
 ``` r
-collect_site_data(
-  site_sf   = sites[1, ],   # choose a site between 1 and 25
-  field_sf  = fields[1, ],  # paired reference field (same number)
-  site_id   = 1,            # used to label the cached files
-  month     = "2024-07"     # any month between "2024-04" and "2024-10"
-)
-
-# repeat for additional months
-collect_site_data(sites[1, ], fields[1, ], site_id = 1, month = "2024-08")
-collect_site_data(sites[1, ], fields[1, ], site_id = 1, month = "2024-09")
+devtools::install_github("marlenecss/agropvR")
+library(agropvR)
 ```
 
-### Step 2 — load cached results
+## STEP 1 — download pre-computed cache from Zenodo
 
-Once collected, load the results for a site. You can load all cached
-months or filter to specific ones.
+# downloads all pre-computed .rds and .tif files
+
+# only needs to be run once — skips files already present
+
+# requires internet connection and some disk space
 
 ``` r
-# load all cached months for site 1
-results <- load_site_results(site_id = 1)
+download_cache()
+```
 
-# load specific months only
+## STEP 2 - check which sites and months are available
+
+# limited due to 30% cloud cover
+
+``` r
+available_sites()
+```
+
+## STEP 3 — load results for a site
+
+# replace site_id number with site of choice
+
+# replace site_id number in subsequent functions
+
+``` r
+results <- load_site_results(site_id = 1)
+```
+
+# or load specific months only
+
+# again replace site number and months
+
+``` r
 results <- load_site_results(
   site_id = 1,
-  months  = c("2024-07", "2024-08", "2024-09")
+  months  = c("2024-06", "2024-07", "2024-08")
 )
 ```
 
-### Step 3 — plot the time series
+# STEP 4 — plot index time series
 
-Compare NDVI, NDMI and BSI between the agrovoltaic site and the
-reference field across the growing season. The shaded band shows mean
-+/- 1 standard deviation.
+# compares NDVI, NDMI and BSI between the
+
+# agrovoltaic site and its paired reference field
+
+# shaded band = mean +/- 1 standard deviation
+
+# replace site_id number with chosen site
 
 ``` r
 plot_indices(results, site_id = 1)
 ```
 
-### Step 4 — map the indices
+# STEP 5 — map indices spatially
 
-Map all three indices spatially for one site and one month. A small
-location map of southern Germany is included for orientation. This may
-also take a feew minutes.
+# maps all three indices side by side for one site and month
+
+# loads from local cache — no download needed after Step 1
+
+# again replace site_number and month
 
 ``` r
 map_indices(site_id = 1, month = "2024-07")
 ```
 
-The red outline marks the agrovoltaic site and the blue outline marks
-the paired reference field.
+# STEP 6 — compare system types
 
-### Step 5 — compare system types
+# compares overhead vs interspace agrovoltaic systems
 
-The 25 sites include two agrovoltaic system types: overhead and
-interspace. Use these functions to compare their environmental impacts.
+# load results from multiple sites and combine them
 
 ``` r
-# summary table of mean index values per system type
-compare_system_types(results)
+results_multi <- dplyr::bind_rows(
+  load_site_results(site_id = 1),
+  load_site_results(site_id = 2),
+  load_site_results(site_id = 3)
+  # add more sites as needed, up to 25
+)
+```
+
+# summary table: mean and SD per index per system type
+
+``` r
+compare_system_types(results_multi)
+```
 
 # bar chart comparing system types across all three indices
-plot_system_types(results)
+
+``` r
+plot_system_types(results_multi)
+```
+
+## OPTIONAL — collect data for a missing site/month
+
+# instead of this
+
+``` r
+collect_site_data(
+  site_sf   = sites[1, ],
+  field_sf  = fields[1, ],
+  site_id   = 1,
+  month     = "2024-05"
+)
+```
+
+# you could try raising the cloud cover threshold
+
+# use with caution as cloudy scenes affect index quality
+
+``` r
+collect_site_data(
+  site_sf   = sites[1, ],
+  field_sf  = fields[1, ],
+  site_id   = 1,
+  month     = "2024-05",
+  max_cloud = 50
+)
+```
+
+\# or look for data in 2025
+
+``` r
+collect_site_data(
+ site_sf = sites[1, ],
+ field_sf = fields[1, ],
+ site_id = 1,
+ month = "2025-04",
+ max_cloud = 30
+)
 ```
 
 ## Notes

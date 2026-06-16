@@ -7,14 +7,16 @@
 #' @param field_sf polygon of the paired reference field
 #' @param site_id label used for cache filenames
 #' @param month character string "YYYY-MM", e.g. "2024-07"
-#' @param cache_dir path to folder where .rds files are saved (default "data/cache")
+#' @param cache_dir path to folder where .rds files are saved (default "cache")
+#' @param max_cloud maximum acceptable cloud cover percentage (default 30)
 #' @return invisible NULL; result is saved to cache_dir as an .rds file
 #' @export
 collect_site_data <- function(site_sf,
                               field_sf,
                               site_id,
                               month,
-                              cache_dir = "cache") {
+                              cache_dir = "cache",
+                              max_cloud = 30) {
 
   dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 

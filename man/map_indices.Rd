@@ -18,14 +18,14 @@ map_indices(
 
 \item{month}{character string "YYYY-MM", e.g. "2024-07"}
 
-\item{cache_dir}{path to cache folder (default "data/cache")}
+\item{cache_dir}{path to cache folder (default "cache")}
 
 \item{sites_sf}{the sites sf object included in the package (sites)}
 
 \item{fields_sf}{the fields sf object included in the package (fields)}
 }
 \value{
-patchwork object with three maps side by side
+patchwork object with three maps and location map
 }
 \description{
 Downloads Sentinel-2 imagery and plots three index maps side by side,

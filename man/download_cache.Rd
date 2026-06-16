@@ -5,7 +5,10 @@
 \title{DOWNLOAD CACHE
 Download pre-computed cache from Zenodo}
 \usage{
-download_cache(cache_dir = "cache", zenodo_id = "20705323")
+download_cache(
+  cache_dir = "cache",
+  zenodo_id = c("20713726", "20713763", "20713833")
+)
 }
 \arguments{
 \item{cache_dir}{Local folder to save files (default "data/cache")}

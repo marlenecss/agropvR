@@ -8,18 +8,14 @@
 #' @param month character string "YYYY-MM", e.g. "2024-07"
 #' @param sites_sf the sites sf object included in the package (sites)
 #' @param fields_sf the fields sf object included in the package (fields)
-#' @param cache_dir path to cache folder (default "data/cache")
-#' @return patchwork object with three maps side by side
+#' @param cache_dir path to cache folder (default "cache")
+#' @return patchwork object with three maps and location map
 #' @export
-#'
 map_indices <- function(site_id,
                         month,
                         cache_dir = "cache",
                         sites_sf  = agropvR::sites,
                         fields_sf = agropvR::fields) {
-
-  message("Downloading Sentinel-2 bands for site ", site_id,
-          " month ", month, " - this may take a few minutes...")
 
   site_sf  <- sites_sf[site_id, ]
   field_sf <- fields_sf[site_id, ]
@@ -84,7 +80,12 @@ map_indices <- function(site_id,
     returnclass = "sf"
   )
 
-  by_bw <- germany[germany$name %in% c("Bayern", "Baden-Wuerttemberg"), ]
+  by_bw <- germany[germany$name %in% c(
+    "Bayern",
+    "Baden-Württemberg",
+    "Baden-Wurttemberg",
+    "Baden-Wuerttemberg"
+  ), ]
   by_bw <- sf::st_transform(by_bw, 4326)
 
   # site centroid for overview map
@@ -103,11 +104,6 @@ map_indices <- function(site_id,
     zoom     = 7,
     crop     = TRUE
   )
-
-  osm_df <- as.data.frame(
-    terra::as.data.frame(osm_tile, xy = TRUE)
-  )
-  colnames(osm_df)[1:2] <- c("x", "y")
 
   # --- index maps (no legend - collected separately) ---
   make_map <- function(index_name, palette, legend_title) {
@@ -138,19 +134,24 @@ map_indices <- function(site_id,
         na.value  = "transparent",
         name      = legend_title,
         guide     = ggplot2::guide_colorbar(
-          barwidth       = 0.6,
-          barheight      = 6,
+          barwidth       = 8,
+          barheight      = 0.5,
           title.position = "top",
-          title.hjust    = 0.5
+          title.hjust    = 0.5,
+          direction      = "horizontal"
         )
       ) +
-      ggplot2::labs(title = index_name) +
+      ggplot2::labs(
+        title = index_name,
+        x     = "Longitude",
+        y     = "Latitude"
+      ) +
       ggplot2::theme_minimal(base_size = 11) +
       ggplot2::theme(
         axis.text        = ggplot2::element_text(size = 7),
         strip.text       = ggplot2::element_text(face = "bold"),
         panel.grid.minor = ggplot2::element_blank(),
-        legend.position  = "none"   # hide individual legends
+        legend.position  = "none"
       ) +
       ggplot2::coord_sf()
   }
@@ -159,68 +160,66 @@ map_indices <- function(site_id,
   p_ndmi <- make_map("NDMI", palette = "Blues",   legend_title = "NDMI")
   p_bsi  <- make_map("BSI",  palette = "YlOrBr",  legend_title = "BSI")
 
-  # --- overview map with OSM basemap and BY/BW borders ---
+  # --- overview map ---
   p_loc <- ggplot2::ggplot() +
-    ggplot2::geom_raster(
-      data    = osm_df,
-      mapping = ggplot2::aes(x = x, y = y, fill = NULL),
-      fill    = "grey90"
-    ) +
     tidyterra::geom_spatraster_rgb(data = osm_tile) +
     ggplot2::geom_sf(
-      data      = by_bw,
-      fill      = NA,
-      colour    = "grey30",
-      linewidth = 0.4,
+      data        = by_bw,
+      fill        = NA,
+      colour      = "grey20",
+      linewidth   = 0.5,
       inherit.aes = FALSE
     ) +
     ggplot2::geom_point(
       data    = site_coords,
       mapping = ggplot2::aes(x = lon, y = lat),
       colour  = "red",
-      size    = 3
+      fill    = "red",
+      shape   = 8,
+      size    = 5,
+      stroke  = 2
     ) +
     ggplot2::coord_sf(
       xlim = c(bbox_bybw["xmin"], bbox_bybw["xmax"]),
       ylim = c(bbox_bybw["ymin"], bbox_bybw["ymax"])
     ) +
-    ggplot2::labs(title = "Location") +
+    ggplot2::labs(
+      title = "Location",
+      x     = "Longitude",
+      y     = "Latitude"
+    ) +
     ggplot2::theme_minimal(base_size = 10) +
     ggplot2::theme(
       axis.text        = ggplot2::element_text(size = 7),
       panel.grid.minor = ggplot2::element_blank()
     )
 
-  # --- build combined legend as a separate ggplot ---
-  # colour bar data for each index
-  legend_ramp <- function(palette, label) {
-    df <- data.frame(
-      x     = 1,
-      y     = seq(0, 1, length.out = 100),
-      value = seq(0, 1, length.out = 100)
-    )
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, fill = value)) +
-      ggplot2::geom_tile() +
-      ggplot2::scale_fill_distiller(
-        palette   = palette,
-        direction = 1,
-        name      = label,
-        guide     = ggplot2::guide_colorbar(
-          barwidth       = 0.6,
-          barheight      = 5,
-          title.position = "top",
-          title.hjust    = 0.5
-        )
-      ) +
-      ggplot2::theme_void() +
-      ggplot2::theme(
-        legend.position  = "right",
-        legend.title     = ggplot2::element_text(size = 9),
-        legend.text      = ggplot2::element_text(size = 8)
-      )
-  }
+  # --- extract legends ---
+  get_legend <- function(p) cowplot::get_legend(p)
 
-  # point legend for site and field outlines
+  leg_ndvi <- get_legend(
+    make_map("NDVI", "Greens", "NDVI") +
+      ggplot2::theme(
+        legend.position  = "bottom",
+        legend.key.width = ggplot2::unit(2, "cm")
+      )
+  )
+  leg_ndmi <- get_legend(
+    make_map("NDMI", "Blues", "NDMI") +
+      ggplot2::theme(
+        legend.position  = "bottom",
+        legend.key.width = ggplot2::unit(2, "cm")
+      )
+  )
+  leg_bsi <- get_legend(
+    make_map("BSI", "YlOrBr", "BSI") +
+      ggplot2::theme(
+        legend.position  = "bottom",
+        legend.key.width = ggplot2::unit(2, "cm")
+      )
+  )
+
+  # site and field outline legend
   p_point_legend <- ggplot2::ggplot() +
     ggplot2::geom_point(
       data    = data.frame(
@@ -228,46 +227,45 @@ map_indices <- function(site_id,
         y     = c(2, 1),
         label = c(paste("Site", site_id), "Reference field")
       ),
-      mapping = ggplot2::aes(x = x, y = y, colour = label),
-      size    = 3,
+      mapping     = ggplot2::aes(x = x, y = y, colour = label),
+      size        = 3,
       show.legend = TRUE
     ) +
     ggplot2::scale_colour_manual(
       name   = NULL,
       values = c(
-        "Reference field"            = "#3399FF",
+        "Reference field" = "#3399FF",
         setNames("red", paste("Site", site_id))
       )
     ) +
     ggplot2::theme_void() +
     ggplot2::theme(
-      legend.position = "right",
+      legend.position = "bottom",
       legend.text     = ggplot2::element_text(size = 9)
     )
 
-  # extract legends only using cowplot
-  get_legend <- function(p) cowplot::get_legend(p)
+  leg_pts <- get_legend(p_point_legend)
 
-  leg_ndvi  <- get_legend(
-    make_map("NDVI", "Greens", "NDVI") +
-      ggplot2::theme(legend.position = "right")
+  # top row: three colour bar legends side by side
+  legend_top <- cowplot::plot_grid(
+    leg_ndvi, leg_ndmi, leg_bsi,
+    nrow  = 1,
+    align = "h"
   )
-  leg_ndmi  <- get_legend(
-    make_map("NDMI", "Blues",  "NDMI") +
-      ggplot2::theme(legend.position = "right")
-  )
-  leg_bsi   <- get_legend(
-    make_map("BSI",  "YlOrBr", "BSI") +
-      ggplot2::theme(legend.position = "right")
-  )
-  leg_pts   <- get_legend(p_point_legend)
 
-  # stack legends vertically
+  # bottom row: site and field outline legend centred
+  legend_bottom <- cowplot::plot_grid(
+    NULL, leg_pts, NULL,
+    nrow       = 1,
+    rel_widths = c(1, 1, 1)
+  )
+
+  # stack legend rows vertically
   combined_legend <- cowplot::plot_grid(
-    leg_ndvi, leg_ndmi, leg_bsi, leg_pts,
-    ncol    = 1,
-    align   = "v",
-    rel_heights = c(1, 1, 1, 0.6)
+    legend_top,
+    legend_bottom,
+    ncol        = 1,
+    rel_heights = c(1, 0.4)
   )
 
   # --- final layout ---

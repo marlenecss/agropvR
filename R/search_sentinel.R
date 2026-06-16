@@ -7,7 +7,7 @@
 #' @param limit maximum number of scenes to consider (default 20)
 #' @return single STAC feature (list) for the best scene
 #' @export
-search_sentinel <- function(bbox_sf, month, limit = 20, max_cloud = 30) {
+search_sentinel <- function(bbox_sf, month, limit = 20, max_cloud = max_cloud) {
   bbox <- sf::st_bbox(sf::st_transform(bbox_sf, 4326))
 
   last_day <- lubridate::days_in_month(as.Date(paste0(month, "-01")))

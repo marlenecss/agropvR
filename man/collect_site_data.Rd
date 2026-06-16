@@ -5,7 +5,14 @@
 \title{COLLECT SITE DATA
 Download and cache data for one agrovoltaic site and one month}
 \usage{
-collect_site_data(site_sf, field_sf, site_id, month, cache_dir = "cache")
+collect_site_data(
+  site_sf,
+  field_sf,
+  site_id,
+  month,
+  cache_dir = "cache",
+  max_cloud = 30
+)
 }
 \arguments{
 \item{site_sf}{polygon of the agrovoltaic facility}
@@ -16,7 +23,9 @@ collect_site_data(site_sf, field_sf, site_id, month, cache_dir = "cache")
 
 \item{month}{character string "YYYY-MM", e.g. "2024-07"}
 
-\item{cache_dir}{path to folder where .rds files are saved (default "data/cache")}
+\item{cache_dir}{path to folder where .rds files are saved (default "cache")}
+
+\item{max_cloud}{maximum acceptable cloud cover percentage (default 30)}
 }
 \value{
 invisible NULL; result is saved to cache_dir as an .rds file
