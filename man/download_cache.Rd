@@ -11,12 +11,12 @@ download_cache(
 )
 }
 \arguments{
-\item{cache_dir}{Local folder to save files (default "data/cache")}
+\item{cache_dir}{local folder to save files (default "cache")}
 
-\item{zenodo_id}{Zenodo record ID (default is the agropvR dataset)}
+\item{zenodo_id}{character vector of Zenodo record IDs}
 }
 \value{
-Invisible NULL
+invisible NULL
 }
 \description{
 Downloads all cached .rds and .tif files from Zenodo.
