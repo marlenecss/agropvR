@@ -82,7 +82,7 @@ map_indices <- function(site_id,
 
   by_bw <- germany[germany$name %in% c(
     "Bayern",
-    "Baden-Württemberg",
+    "Baden-W\u00fcrttemberg",
     "Baden-Wurttemberg",
     "Baden-Wuerttemberg"
   ), ]
@@ -269,7 +269,7 @@ map_indices <- function(site_id,
   )
 
   # --- final layout ---
-  maps_row <- p_ndvi + p_ndmi + p_bsi
+  maps_row <- patchwork::wrap_plots(p_ndvi, p_ndmi, p_bsi, nrow = 1)
 
   bottom_row <- patchwork::wrap_plots(p_loc) |
     patchwork::wrap_elements(combined_legend)

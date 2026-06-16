@@ -23,7 +23,7 @@ compare_system_types <- function(results, sites_sf = agropvR::sites) {
         system_typ     = unique(g$system_typ),
 
         ndvi_site_mean = base::mean(g$ndvi_site_mean, na.rm = TRUE),
-        ndvi_site_sd   = state::sd(g$ndvi_site_mean,   na.rm = TRUE),
+        ndvi_site_sd   = stats::sd(g$ndvi_site_mean,   na.rm = TRUE),
         ndvi_ref_mean  = base::mean(g$ndvi_ref_mean,  na.rm = TRUE),
         ndvi_ref_sd    = stats::sd(g$ndvi_ref_mean,    na.rm = TRUE),
 

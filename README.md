@@ -53,9 +53,9 @@ library(agropvR)
 
 ## STEP 1 — download pre-computed cache from Zenodo
 
-downloads all pre-computed .rds and .tif files only needs to be run once
-— skips files already present requires internet connection and some disk
-space
+downloads all pre-computed .rds and .tif files; only needs to be run
+once — skips files already present requires internet connection and some
+disk space
 
 ``` r
 download_cache()
@@ -83,7 +83,7 @@ or load specific months only
 ``` r
 results <- load_site_results(
   site_id = 1,
-  months  = c("2024-06", "2024-07", "2024-08")
+  months  = c("2024-04", "2024-06", "2024-08")
 )
 ```
 
@@ -102,7 +102,7 @@ maps all three indices side by side for one site and month loads from
 local cache — no download needed after Step 1
 
 ``` r
-map_indices(site_id = 1, month = "2024-07")
+map_indices(site_id = 1, month = "2024-04")
 ```
 
 ## STEP 6 — compare system types

@@ -22,7 +22,6 @@ Imports:
     patchwork,
     rlang,
     rnaturalearth,
-    rnaturalearthdata,
     rstac,
     sf,
     terra,
