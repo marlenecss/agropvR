@@ -121,13 +121,13 @@ results_multi <- dplyr::bind_rows(
 )
 ```
 
-# summary table: mean and SD per index per system type
+summary table: mean and SD per index per system type
 
 ``` r
 compare_system_types(results_multi)
 ```
 
-# bar chart comparing system types across all three indices
+bar chart comparing system types across all three indices
 
 ``` r
 plot_system_types(results_multi)
@@ -135,7 +135,7 @@ plot_system_types(results_multi)
 
 ## OPTIONAL — collect data for a missing site/month
 
-# instead of this
+instead of this
 
 ``` r
 collect_site_data(
@@ -146,9 +146,8 @@ collect_site_data(
 )
 ```
 
-# you could try raising the cloud cover threshold
-
-# use with caution as cloudy scenes affect index quality
+you could try raising the cloud cover threshold use with caution as
+cloudy scenes affect index quality
 
 ``` r
 collect_site_data(
@@ -160,7 +159,7 @@ collect_site_data(
 )
 ```
 
-# or look for data in 2025
+or look for data in 2025
 
 ``` r
 collect_site_data(
