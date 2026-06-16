@@ -89,15 +89,15 @@ plot_indices(results, site_id = 1)
 ```
 
 ## STEP 5 — map indices spatially
-# maps all three indices side by side for one site and month
-# loads from local cache — no download needed after Step 1
+maps all three indices side by side for one site and month
+loads from local cache — no download needed after Step 1
 ```r
 map_indices(site_id = 1, month = "2024-07")
 ```
 
 ## STEP 6 — compare system types
-# compares overhead vs interspace agrovoltaic systems
-# load results from multiple sites and combine them
+compares overhead vs interspace agrovoltaic systems
+load results from multiple sites and combine them
 ```r
 results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 1),
