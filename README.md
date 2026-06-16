@@ -51,10 +51,7 @@ head(fields)
 
 # install.packages(“devtools”)
 
-``` r
-devtools::install_github("marlenecss/agropvR")
-library(agropvR)
-```
+devtools::install_github(“marlenecss/agropvR”) library(agropvR)
 
 ## STEP 1 — download pre-computed cache from Zenodo
 
@@ -64,17 +61,13 @@ library(agropvR)
 
 # requires internet connection and some disk space
 
-``` r
 download_cache()
-```
 
 ## STEP 2 - check which sites and months are available
 
 # limited due to 30% cloud cover
 
-``` r
 available_sites()
-```
 
 ## STEP 3 — load results for a site
 
@@ -82,20 +75,12 @@ available_sites()
 
 # replace site_id number in subsequent functions
 
-``` r
-results <- load_site_results(site_id = 1)
-```
+results \<- load_site_results(site_id = 1)
 
 # or load specific months only
 
-# again replace site number and months
-
-``` r
-results <- load_site_results(
-  site_id = 1,
-  months  = c("2024-06", "2024-07", "2024-08")
-)
-```
+results \<- load_site_results( site_id = 1, months = c(“2024-06”,
+“2024-07”, “2024-08”) )
 
 # STEP 4 — plot index time series
 
@@ -105,11 +90,7 @@ results <- load_site_results(
 
 # shaded band = mean +/- 1 standard deviation
 
-# replace site_id number with chosen site
-
-``` r
 plot_indices(results, site_id = 1)
-```
 
 # STEP 5 — map indices spatially
 
@@ -117,11 +98,7 @@ plot_indices(results, site_id = 1)
 
 # loads from local cache — no download needed after Step 1
 
-# again replace site_number and month
-
-``` r
-map_indices(site_id = 1, month = "2024-07")
-```
+map_indices(site_id = 1, month = “2024-07”)
 
 # STEP 6 — compare system types
 
@@ -129,65 +106,33 @@ map_indices(site_id = 1, month = "2024-07")
 
 # load results from multiple sites and combine them
 
-``` r
-results_multi <- dplyr::bind_rows(
-  load_site_results(site_id = 1),
-  load_site_results(site_id = 2),
-  load_site_results(site_id = 3)
-  # add more sites as needed, up to 25
-)
-```
+results_multi \<- dplyr::bind_rows( load_site_results(site_id = 1),
+load_site_results(site_id = 2), load_site_results(site_id = 3) \# add
+more sites as needed, up to 25 )
 
 # summary table: mean and SD per index per system type
 
-``` r
 compare_system_types(results_multi)
-```
 
 # bar chart comparing system types across all three indices
 
-``` r
 plot_system_types(results_multi)
-```
 
 ## OPTIONAL — collect data for a missing site/month
 
 # instead of this
 
-``` r
-collect_site_data(
-  site_sf   = sites[1, ],
-  field_sf  = fields[1, ],
-  site_id   = 1,
-  month     = "2024-05"
-)
-```
+collect_site_data( site_sf = sites\[1, \], field_sf = fields\[1, \],
+site_id = 1, month = “2024-05” )
 
 # you could try raising the cloud cover threshold
 
 # use with caution as cloudy scenes affect index quality
 
-``` r
-collect_site_data(
-  site_sf   = sites[1, ],
-  field_sf  = fields[1, ],
-  site_id   = 1,
-  month     = "2024-05",
-  max_cloud = 50
-)
-```
-
-\# or look for data in 2025
-
-``` r
-collect_site_data(
- site_sf = sites[1, ],
- field_sf = fields[1, ],
- site_id = 1,
- month = "2025-04",
- max_cloud = 30
-)
-```
+collect_site_data( site_sf = sites\[1, \], field_sf = fields\[1, \],
+site_id = 1, month = “2024-05”, max_cloud = 50 ) \# or look for data in
+2025 collect_site_data( site_sf = sites\[1, \], field_sf = fields\[1,
+\], site_id = 1, month = “2025-04”, max_cloud = 30 )
 
 ## Notes
 
