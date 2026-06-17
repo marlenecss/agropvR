@@ -8,14 +8,14 @@ Load cached results for a site, optionally filtering by month}
 load_site_results(site_id, months = NULL, cache_dir = "cache")
 }
 \arguments{
-\item{site_id}{site identifier matching the one used in collect_site_data()}
+\item{site_id}{Integer site identifier matching the one used in collect_site_data()}
 
-\item{months}{optional character vector of "YYYY-MM" to filter; NULL returns all months}
+\item{months}{Optional character vector of "YYYY-MM" to filter; NULL returns all months}
 
-\item{cache_dir}{path to cache folder (must match the one used in collect_site_data())}
+\item{cache_dir}{Path to cache folder (must match the one used in collect_site_data())}
 }
 \value{
-data.frame with one row per month
+A data.frame with one row per month
 }
 \description{
 LOAD SITE RESULTS

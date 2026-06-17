@@ -5,7 +5,7 @@
 \title{SEARCH SENTINEL
 Find the least cloudy Sentinel-2 scene for a site and month}
 \usage{
-search_sentinel(bbox_sf, month, limit = 20, max_cloud = max_cloud)
+search_sentinel(bbox_sf, month, limit = 20, max_cloud = 30)
 }
 \arguments{
 \item{bbox_sf}{object, its bounding box is used for the STAC search}
