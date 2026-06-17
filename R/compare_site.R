@@ -18,6 +18,19 @@ compare_site <- function(site_sf, field_sf, buffer_sf, month) {
   # load and crop bands using the buffered field extent
   bands <- load_bands(scene, buffer_sf)
 
+  compare_site <- function(site_sf, field_sf, buffer_sf, month, site_id) {
+    scene <- search_sentinel(site_sf, month)
+    if (is.null(scene)) return(NULL)
+
+    bands <- load_bands(scene, buffer_sf)
+
+    # mask out PV panel pixels from each band
+    bands <- lapply(bands, mask_panels, site_id = site_id)
+
+    indices <- calc_indices(bands)
+    extract_stats(indices, site_sf, field_sf, month)
+  }
+
   # calculate indices
   indices <- calc_indices(bands)
 

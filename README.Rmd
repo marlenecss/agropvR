@@ -6,73 +6,77 @@ output: github_document
 
 # agropvR
 
-agropvR is an R package for mapping and analysing the environmental 
-impact of agrophotovoltaic facilities on agricultural fields in Bavaria 
-and Baden-Württemberg, Germany, using Sentinel-2 satellite imagery.
+agropvR is an R package for mapping and analysing the environmental
+impact of agrophotovoltaic facilities on agricultural fields in Bavaria and Baden-Württemberg, Germany, using Sentinel-2 satellite imagery.
 
-Agrophotovoltaic facilities combine solar energy production with agricultural
-land use. This package allows users to compare vegetation and soil 
-conditions between agrovoltaic sites and paired reference fields using 
-three spectral indices:
+Agrophotovoltaic facilities combine solar energy production with
+agricultural land use. This package allows users to compare vegetation and soil conditions between agrovoltaic sites and paired reference fields using three spectral indices:
 
 - **NDVI** — Normalised Difference Vegetation Index (vegetation health)
 - **NDMI** — Normalised Difference Moisture Index (moisture content)
 - **BSI** — Bare Soil Index (soil exposure)
 
+Pixels covered by photovoltaic panels are masked out before all
+statistics are calculated, so index values reflect the surrounding
+crop and soil conditions rather than the panels themselves.
+
 ## Installation
 
 ```r
-# install from GitHub
+install.packages("devtools")
 devtools::install_github("marlenecss/agropvR")
 ```
 
 ## Data
 
-The package includes two built-in datasets digitised from the 
-[Fraunhofer ISE Agrivoltaics Map](https://agrivoltaicsmap.ise.fraunhofer.de/):
+The package includes three built-in datasets, digitised from the
+[Fraunhofer ISE Agrivoltaics  Map](https://agrivoltaicsmap.ise.fraunhofer.de/)
+and from satellite basemap imagery in QGIS:
 
 - `sites` — 25 agrovoltaic facility polygons across Bavaria and Baden-Württemberg
 - `fields` — 25 paired reference agricultural field polygons
+- `panels` — 655 photovoltaic panel array footprints, linked to sites via `site_id`
 
 ```r
 library(agropvR)
 
-# inspect the data
 head(sites)
 head(fields)
+head(panels)
 ```
 
 ## Workflow
 
-## SETUP
-```r
-install.packages("devtools")
-devtools::install_github("marlenecss/agropvR")
-library(agropvR)
-```
+### Step 1 — download pre-computed cache
 
-## STEP 1 — download pre-computed cache
-downloads all pre-computed .rds and .tif files;
-only needs to be run once — skips files already present,
-requires internet connection and some disk space
+Downloads all pre-computed `.rds` and `.tif` files from Zenodo. Only
+needs to be run once — skips files already present. Requires an
+internet connection and some disk space.
+
 ```r
 download_cache()
 ```
 
-## STEP 2 - check availability
-limited to 30% cloud cover
+### Step 2 — check availability
+
+Not every site and month combination is available, since scenes with
+more than 30% cloud cover are excluded by default.
+
 ```r
 available_sites()
 ```
 
-## STEP 3 — load results for a site
-replace site_id number with site of choice,
-replace site_id number in subsequent functions
+### Step 3 — load results for a site
+
+Replace `site_id` with the site you want to explore. Use the same
+`site_id` consistently in all following steps.
+
 ```r
 results <- load_site_results(site_id = 1)
 ```
 
-or load specific months only
+Or load specific months only:
+
 ```r
 results <- load_site_results(
   site_id = 1,
@@ -80,24 +84,28 @@ results <- load_site_results(
 )
 ```
 
-## STEP 4 — plot index time series
-compares NDVI, NDMI and BSI between the,
-agrovoltaic site and its paired reference field,
-shaded band = mean +/- 1 standard deviation,
+### Step 4 — plot index time series
+
+Compares NDVI, NDMI and BSI between the agrovoltaic site and its
+paired reference field. The shaded band shows mean ± 1 standard
+deviation.
+
 ```r
 plot_indices(results, site_id = 1)
 ```
 
-## STEP 5 — map indices spatially
-maps all three indices side by side for one site and month,
-loads from local cache — no download needed after Step 1
+### Step 5 — map indices spatially
+
+Maps all three indices side by side for one site and month, alongside a location overview and a panel footprint overview. Note: this map shows the full unmasked scene for visual clarity — the underlying statistics from `load_site_results()` are based on masked data that excludes panel pixels.
+
 ```r
 map_indices(site_id = 1, month = "2024-04")
 ```
 
-## STEP 6 — compare system types
-compares overhead vs interspace agrovoltaic systems,
-load results from multiple sites and combine them
+### Step 6 — compare system types
+
+Compares overhead vs interspace agrovoltaic systems. Load and combine results from multiple sites first.
+
 ```r
 results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 1),
@@ -105,20 +113,18 @@ results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 3)
   # add more sites as needed, up to 25
 )
-```
 
-summary table: mean and SD per index per system type
-```r
+# summary table: mean and SD per index per system type
 compare_system_types(results_multi)
-```
 
-bar chart comparing system types across all three indices
-```r
+# bar chart comparing system types across all three indices
 plot_system_types(results_multi)
 ```
 
-## OPTIONAL — collect data for a missing site/month
-instead of this
+## Optional — collect data for a missing site or month
+
+If `available_sites()` shows a gap, or you want to extend the analysis to new months or years, use `collect_site_data()` directly. This requires an internet connection and may take several minutes per site/month.
+
 ```r
 collect_site_data(
   site_sf   = sites[1, ],
@@ -128,9 +134,8 @@ collect_site_data(
 )
 ```
 
-you could try raising the cloud cover threshold,
-use with caution as cloudy scenes affect index quality,
-important: 'site_sf', 'field_sf' and 'site_id' must always refer to the same site number
+If no suitable scene is found, try raising the cloud cover threshold (use with caution, as cloudier scenes reduce index quality):
+
 ```r
 collect_site_data(
   site_sf   = sites[1, ],
@@ -140,24 +145,27 @@ collect_site_data(
   max_cloud = 50
 )
 ```
-or look for data in 2025
+
+Or extend the analysis to a new year:
+
 ```r
 collect_site_data(
- site_sf = sites[1, ],
- field_sf = fields[1, ],
- site_id = 1,
- month = "2025-04",
- max_cloud = 30
+  site_sf   = sites[1, ],
+  field_sf  = fields[1, ],
+  site_id   = 1,
+  month     = "2025-04"
 )
 ```
 
+**Important:** `site_sf`, `field_sf`, and `site_id` must always refer to the same site number.
+
 ## Notes
 
-- Cloud cover is limited to a maximum of 30% when searching for 
-  Sentinel-2 scenes. If no suitable scene is found for a given month, 
-  try a different month.
-- Cached results are stored in `data/cache/` and are not included in 
-  the package repository. Each user runs `collect_site_data()` on 
-  their own machine.
-- Sentinel-2 imagery is accessed via the 
+- Cloud cover is limited to a maximum of 30% by default when searching
+  for Sentinel-2 scenes. If no suitable scene is found for a given
+  month, try a different month or raise `max_cloud`.
+- Cached results are stored in a local `cache/` folder, which is not
+  included in the package repository. Run `download_cache()` to
+  populate it from Zenodo.
+- Sentinel-2 imagery is accessed via the
   [Element84 Earth Search STAC API](https://earth-search.aws.element84.com/v1).

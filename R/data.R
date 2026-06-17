@@ -15,3 +15,12 @@
 #' @format an sf object with 25 rows and a geometry column (CRS: EPSG 25832)
 #' @source https://agrivoltaicsmap.ise.fraunhofer.de/
 "fields"
+
+#' Photovoltaic panel footprints
+#'
+#' Digitised polygons of individual photovoltaic panel arrays within
+#' each agrovoltaic site. Multiple polygons per site, linked via site_id.
+#'
+#' @format An sf object with 655 rows and a geometry column (CRS: EPSG 25832)
+#' @source Digitised in QGIS using satellite basemap imagery
+"panels"

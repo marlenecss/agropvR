@@ -1,11 +1,12 @@
 #' COLLECT SITE DATA
 #' Download and cache data for one agrovoltaic site and one month
 #'
-#' Safe to re-run — skips if that month is already cached.
+#' Safe to re-run - skips if that month is already cached.
+#' PV panel pixels are masked out before computing indices.
 #'
 #' @param site_sf polygon of the agrovoltaic facility
 #' @param field_sf polygon of the paired reference field
-#' @param site_id label used for cache filenames
+#' @param site_id label used for cache filenames and panel masking
 #' @param month character string "YYYY-MM", e.g. "2024-07"
 #' @param cache_dir path to folder where .rds files are saved (default "cache")
 #' @param max_cloud maximum acceptable cloud cover percentage (default 30)
@@ -38,7 +39,7 @@ collect_site_data <- function(site_sf,
   message("Processing: ", label)
 
   # find scene
-  scene <- search_sentinel(site_sf, month)
+  scene <- search_sentinel(site_sf, month, max_cloud = max_cloud)
 
   if (is.null(scene)) {
     message("  FAILED: no suitable scene found")
@@ -55,6 +56,9 @@ collect_site_data <- function(site_sf,
   )
 
   if (is.null(bands)) return(invisible(NULL))
+
+  # mask out PV panel pixels from each band
+  bands <- lapply(bands, mask_panels, site_id = site_id)
 
   # compute indices
   indices <- calc_indices(bands)

@@ -1,37 +1,41 @@
 #' MAP INDICES
 #' Map NDVI, NDMI, and BSI for one agrovoltaic site and month
 #'
-#' Downloads Sentinel-2 imagery and plots three index maps side by side,
-#' with site and reference field outlines overlaid.
+#' Loads unmasked index rasters for visual display, alongside a location
+#' map and a panel footprint overview. Note: this map intentionally shows
+#' the full unmasked scene for visual clarity. Statistics from
+#' load_site_results() are based on masked data which excludes PV panel
+#' pixels.
 #'
 #' @param site_id site identifier
 #' @param month character string "YYYY-MM", e.g. "2024-07"
+#' @param cache_dir path to folder with unmasked cached rasters (default "cache_unmasked")
 #' @param sites_sf the sites sf object included in the package (sites)
 #' @param fields_sf the fields sf object included in the package (fields)
-#' @param cache_dir path to cache folder (default "cache")
-#' @return patchwork object with three maps and location map
+#' @param panels_sf the panels sf object included in the package (panels)
+#' @return patchwork object with three index maps and two overview maps
 #' @export
 map_indices <- function(site_id,
                         month,
-                        cache_dir = "cache",
+                        cache_dir = "cache_unmasked",
                         sites_sf  = agropvR::sites,
-                        fields_sf = agropvR::fields) {
+                        fields_sf = agropvR::fields,
+                        panels_sf = agropvR::panels) {
 
   site_sf  <- sites_sf[site_id, ]
   field_sf <- fields_sf[site_id, ]
 
-  # build buffer around field
   buffer_sf <- sf::st_buffer(
     sf::st_transform(field_sf, 25832),
     dist = 300
   )
 
-  # check for cached raster first
+  # check for cached unmasked raster
   label  <- paste0("site_", site_id, "_", month)
   tif_fp <- file.path(cache_dir, paste0(label, ".tif"))
 
   if (file.exists(tif_fp)) {
-    message("Loading cached raster for site ", site_id, " month ", month)
+    message("Loading unmasked cached raster for site ", site_id, " month ", month)
     indices <- terra::rast(tif_fp)
   } else {
     message("Downloading Sentinel-2 bands for site ", site_id,
@@ -54,6 +58,9 @@ map_indices <- function(site_id,
   field_plot  <- sf::st_transform(field_sf,  crs_rast)
   buffer_plot <- sf::st_transform(buffer_sf, crs_rast)
 
+  site_panels <- panels_sf[panels_sf$site_id == site_id, ]
+  panels_plot <- sf::st_transform(site_panels, crs_rast)
+
   # crop indices to buffer
   indices <- terra::crop(indices, terra::vect(buffer_plot))
 
@@ -68,10 +75,10 @@ map_indices <- function(site_id,
 
   raster_df <- do.call(rbind, lapply(c("NDVI", "NDMI", "BSI"), make_df))
 
-  site_df  <- sf::st_as_sf(site_plot)
-  field_df <- sf::st_as_sf(field_plot)
+  site_df   <- sf::st_as_sf(site_plot)
+  field_df  <- sf::st_as_sf(field_plot)
+  panels_df <- sf::st_as_sf(panels_plot)
 
-  # format title month
   month_label <- format(as.Date(paste0(month, "-01")), "%B %Y")
 
   # --- admin boundaries for BY and BW ---
@@ -88,14 +95,12 @@ map_indices <- function(site_id,
   ), ]
   by_bw <- sf::st_transform(by_bw, 4326)
 
-  # site centroid for overview map
   site_wgs    <- sf::st_transform(site_sf, 4326)
   site_coords <- as.data.frame(
     sf::st_coordinates(sf::st_centroid(site_wgs))
   )
   colnames(site_coords) <- c("lon", "lat")
 
-  # --- OSM basemap for overview ---
   bbox_bybw <- sf::st_bbox(by_bw)
 
   osm_tile <- maptiles::get_tiles(
@@ -160,7 +165,7 @@ map_indices <- function(site_id,
   p_ndmi <- make_map("NDMI", palette = "Blues",   legend_title = "NDMI")
   p_bsi  <- make_map("BSI",  palette = "YlOrBr",  legend_title = "BSI")
 
-  # --- overview map ---
+  # --- overview map: location in BY/BW ---
   p_loc <- ggplot2::ggplot() +
     tidyterra::geom_spatraster_rgb(data = osm_tile) +
     ggplot2::geom_sf(
@@ -193,6 +198,34 @@ map_indices <- function(site_id,
       axis.text        = ggplot2::element_text(size = 7),
       panel.grid.minor = ggplot2::element_blank()
     )
+
+  # --- overview map: site outline + panel footprints ---
+  p_panels <- ggplot2::ggplot() +
+    ggplot2::geom_sf(
+      data        = site_df,
+      fill        = NA,
+      colour      = "red",
+      linewidth   = 1,
+      inherit.aes = FALSE
+    ) +
+    ggplot2::geom_sf(
+      data        = panels_df,
+      fill        = "grey40",
+      colour      = "grey20",
+      alpha       = 0.6,
+      inherit.aes = FALSE
+    ) +
+    ggplot2::labs(
+      title = "Panel footprint",
+      x     = "Longitude",
+      y     = "Latitude"
+    ) +
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(
+      axis.text        = ggplot2::element_text(size = 7),
+      panel.grid.minor = ggplot2::element_blank()
+    ) +
+    ggplot2::coord_sf()
 
   # --- extract legends ---
   get_legend <- function(p) cowplot::get_legend(p)
@@ -246,21 +279,18 @@ map_indices <- function(site_id,
 
   leg_pts <- get_legend(p_point_legend)
 
-  # top row: three colour bar legends side by side
   legend_top <- cowplot::plot_grid(
     leg_ndvi, leg_ndmi, leg_bsi,
     nrow  = 1,
     align = "h"
   )
 
-  # bottom row: site and field outline legend centred
   legend_bottom <- cowplot::plot_grid(
     NULL, leg_pts, NULL,
     nrow       = 1,
     rel_widths = c(1, 1, 1)
   )
 
-  # stack legend rows vertically
   combined_legend <- cowplot::plot_grid(
     legend_top,
     legend_bottom,
@@ -271,7 +301,9 @@ map_indices <- function(site_id,
   # --- final layout ---
   maps_row <- patchwork::wrap_plots(p_ndvi, p_ndmi, p_bsi, nrow = 1)
 
-  bottom_row <- patchwork::wrap_plots(p_loc) |
+  overview_row <- patchwork::wrap_plots(p_loc, p_panels, nrow = 1)
+
+  bottom_row <- patchwork::wrap_plots(overview_row) |
     patchwork::wrap_elements(combined_legend)
 
   (maps_row / bottom_row) +
