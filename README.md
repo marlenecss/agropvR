@@ -51,19 +51,19 @@ devtools::install_github("marlenecss/agropvR")
 library(agropvR)
 ```
 
-## STEP 1 — download pre-computed cache from Zenodo
+## STEP 1 — download pre-computed cache
 
 downloads all pre-computed .rds and .tif files; only needs to be run
-once — skips files already present requires internet connection and some
-disk space
+once — skips files already present, requires internet connection and
+some disk space
 
 ``` r
 download_cache()
 ```
 
-## STEP 2 - check which sites and months are available
+## STEP 2 - check availability
 
-limited due to 30% cloud cover
+limited to 30% cloud cover
 
 ``` r
 available_sites()
@@ -71,7 +71,7 @@ available_sites()
 
 ## STEP 3 — load results for a site
 
-replace site_id number with site of choice replace site_id number in
+replace site_id number with site of choice, replace site_id number in
 subsequent functions
 
 ``` r
@@ -89,8 +89,8 @@ results <- load_site_results(
 
 ## STEP 4 — plot index time series
 
-compares NDVI, NDMI and BSI between the agrovoltaic site and its paired
-reference field shaded band = mean +/- 1 standard deviation
+compares NDVI, NDMI and BSI between the, agrovoltaic site and its paired
+reference field, shaded band = mean +/- 1 standard deviation,
 
 ``` r
 plot_indices(results, site_id = 1)
@@ -98,7 +98,7 @@ plot_indices(results, site_id = 1)
 
 ## STEP 5 — map indices spatially
 
-maps all three indices side by side for one site and month loads from
+maps all three indices side by side for one site and month, loads from
 local cache — no download needed after Step 1
 
 ``` r
@@ -107,7 +107,7 @@ map_indices(site_id = 1, month = "2024-04")
 
 ## STEP 6 — compare system types
 
-compares overhead vs interspace agrovoltaic systems load results from
+compares overhead vs interspace agrovoltaic systems, load results from
 multiple sites and combine them
 
 ``` r
@@ -144,8 +144,9 @@ collect_site_data(
 )
 ```
 
-you could try raising the cloud cover threshold use with caution as
-cloudy scenes affect index quality
+you could try raising the cloud cover threshold, use with caution as
+cloudy scenes affect index quality, important: ‘site_sf’, ‘field_sf’ and
+‘site_id’ must always refer to the same site number
 
 ``` r
 collect_site_data(
