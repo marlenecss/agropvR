@@ -136,10 +136,11 @@ plot_system_types(results_multi)
 
 ## Optional — collect data for a missing site or month
 
-If `available_sites()` shows a gap, or you want to extend the analysis
-to new months or years, use `collect_site_data()` directly. This
-requires an internet connection and may take several minutes per
-site/month.
+If `available_sites()` shows a gap due to cloud cover, or you want to
+extend the analysis to new months or years, use `collect_site_data()`
+directly. This requires an internet connection and may take several
+minutes per site/month. After loading the new data, you can start over
+with step 3.
 
 ``` r
 collect_site_data(

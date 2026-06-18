@@ -101,9 +101,12 @@ map_indices <- function(site_id,
   month_label <- format(as.Date(paste0(month, "-01")), "%B %Y")
 
   # --- admin boundaries for BY and BW ---
-  germany <- rnaturalearth::ne_states(
-    country     = "Germany",
-    returnclass = "sf"
+  germany <- tryCatch(
+    rnaturalearth::ne_states(country = "Germany", returnclass = "sf"),
+    error = function(e) {
+      message("High-res boundaries unavailable, using country-level outline instead")
+      rnaturalearth::ne_countries(country = "Germany", returnclass = "sf")
+    }
   )
 
   by_bw <- germany[germany$name %in% c(
