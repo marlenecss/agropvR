@@ -59,7 +59,13 @@ map_indices <- function(site_id,
   buffer_plot <- sf::st_transform(buffer_sf, crs_rast)
 
   site_panels <- panels_sf[panels_sf$site_id == site_id, ]
-  panels_plot <- sf::st_transform(site_panels, crs_rast)
+
+  if (nrow(site_panels) == 0) {
+    message("No panel polygons found for site ", site_id)
+    panels_plot <- NULL
+  } else {
+    panels_plot <- sf::st_transform(site_panels, crs_rast)
+  }
 
   # crop indices to buffer
   indices <- terra::crop(indices, terra::vect(buffer_plot))
@@ -77,8 +83,21 @@ map_indices <- function(site_id,
 
   site_df   <- sf::st_as_sf(site_plot)
   field_df  <- sf::st_as_sf(field_plot)
-  panels_df <- sf::st_as_sf(panels_plot)
+  panels_df <- if (!is.null(panels_plot)) sf::st_as_sf(panels_plot) else NULL
 
+  p_panels <- ggplot2::ggplot() +
+    ggplot2::geom_sf(data = site_df, fill = NA, colour = "red", linewidth = 1, inherit.aes = FALSE)
+
+  if (!is.null(panels_df)) {
+    p_panels <- p_panels +
+      ggplot2::geom_sf(data = panels_df, fill = "grey40", colour = "grey20", alpha = 0.6, inherit.aes = FALSE)
+  }
+
+  p_panels <- p_panels +
+    ggplot2::labs(title = "Panel footprint", x = "Longitude", y = "Latitude") +
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(axis.text = ggplot2::element_text(size = 7), panel.grid.minor = ggplot2::element_blank()) +
+    ggplot2::coord_sf()
   month_label <- format(as.Date(paste0(month, "-01")), "%B %Y")
 
   # --- admin boundaries for BY and BW ---

@@ -107,6 +107,12 @@ map_indices(site_id = 1, month = "2024-04")
 Compares overhead vs interspace agrovoltaic systems. Load and combine results from multiple sites first.
 
 ```r
+list_system_types()
+```
+
+Then load and combine results from multiple sites:
+
+```r
 results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 1),
   load_site_results(site_id = 2),
@@ -164,8 +170,18 @@ collect_site_data(
 - Cloud cover is limited to a maximum of 30% by default when searching
   for Sentinel-2 scenes. If no suitable scene is found for a given
   month, try a different month or raise `max_cloud`.
+- Pixels covered by photovoltaic panels (from the `panels` dataset) are
+  masked out before computing the statistics returned by
+  `load_site_results()`, `plot_indices()`, `compare_system_types()`,
+  and `plot_system_types()`. The maps produced by `map_indices()`
+  intentionally show the full unmasked scene for visual clarity, with
+  panel footprints displayed separately in the "Panel footprint"
+  overview panel.
 - Cached results are stored in a local `cache/` folder, which is not
   included in the package repository. Run `download_cache()` to
   populate it from Zenodo.
+- `map_indices()` reads from a separate `cache_unmasked/` folder by
+  default, since its purpose is visual display rather than statistics.
+  Run `download_cache(cache_dir = "cache_unmasked")` to populate it.
 - Sentinel-2 imagery is accessed via the
   [Element84 Earth Search STAC API](https://earth-search.aws.element84.com/v1).

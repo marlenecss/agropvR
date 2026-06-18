@@ -8,9 +8,10 @@ Map NDVI, NDMI, and BSI for one agrovoltaic site and month}
 map_indices(
   site_id,
   month,
-  cache_dir = "cache",
+  cache_dir = "cache_unmasked",
   sites_sf = agropvR::sites,
-  fields_sf = agropvR::fields
+  fields_sf = agropvR::fields,
+  panels_sf = agropvR::panels
 )
 }
 \arguments{
@@ -18,16 +19,21 @@ map_indices(
 
 \item{month}{character string "YYYY-MM", e.g. "2024-07"}
 
-\item{cache_dir}{path to cache folder (default "cache")}
+\item{cache_dir}{path to folder with unmasked cached rasters (default "cache_unmasked")}
 
 \item{sites_sf}{the sites sf object included in the package (sites)}
 
 \item{fields_sf}{the fields sf object included in the package (fields)}
+
+\item{panels_sf}{the panels sf object included in the package (panels)}
 }
 \value{
-patchwork object with three maps and location map
+patchwork object with three index maps and two overview maps
 }
 \description{
-Downloads Sentinel-2 imagery and plots three index maps side by side,
-with site and reference field outlines overlaid.
+Loads unmasked index rasters for visual display, alongside a location
+map and a panel footprint overview. Note: this map intentionally shows
+the full unmasked scene for visual clarity. Statistics from
+load_site_results() are based on masked data which excludes PV panel
+pixels.
 }

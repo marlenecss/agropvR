@@ -9,7 +9,7 @@
 #' @return invisible NULL
 #' @export
 download_cache <- function(cache_dir = "cache",
-                           zenodo_id  = c("20713726", "20713763", "20713833")) {
+                           zenodo_id  = c("20705323", "20713763", "20713833")) {
 
   dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -20,13 +20,33 @@ download_cache <- function(cache_dir = "cache",
     api_url  <- paste0("https://zenodo.org/api/records/", id)
     response <- httr::GET(api_url)
     content  <- httr::content(response, as = "parsed")
-    files    <- content$files
+
+    # try inline files first (older API format)
+    files <- content$files
+
+    # fall back to separate files endpoint (newer API format)
+    if (is.null(files) || length(files) == 0) {
+      files_url <- content$links$files
+
+      if (!is.null(files_url)) {
+        files_response <- httr::GET(files_url)
+        files_content  <- httr::content(files_response, as = "parsed")
+        files <- files_content$entries
+      }
+    }
+
+    if (is.null(files) || length(files) == 0) {
+      message("  No files found for record ", id, " - skipping")
+      next
+    }
 
     message("Found ", length(files), " files")
 
     for (f in files) {
-      fname   <- f$key
-      furl    <- f$links$self
+      fname <- f$key
+      furl  <- f$links$content
+      if (is.null(furl)) furl <- f$links$self
+
       dest_fp <- file.path(cache_dir, fname)
 
       if (file.exists(dest_fp)) {

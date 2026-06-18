@@ -19,7 +19,7 @@ collect_site_data(
 
 \item{field_sf}{polygon of the paired reference field}
 
-\item{site_id}{label used for cache filenames}
+\item{site_id}{label used for cache filenames and panel masking}
 
 \item{month}{character string "YYYY-MM", e.g. "2024-07"}
 
@@ -31,5 +31,6 @@ collect_site_data(
 invisible NULL; result is saved to cache_dir as an .rds file
 }
 \description{
-Safe to re-run — skips if that month is already cached.
+Safe to re-run - skips if that month is already cached.
+PV panel pixels are masked out before computing indices.
 }
