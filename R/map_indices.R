@@ -22,8 +22,8 @@ map_indices <- function(site_id,
                         fields_sf = agropvR::fields,
                         panels_sf = agropvR::panels) {
 
-  site_sf  <- sites_sf[site_id, ]
-  field_sf <- fields_sf[site_id, ]
+  site_sf  <- sf::st_as_sf(sites_sf[site_id, , drop = FALSE])
+  field_sf <- sf::st_as_sf(fields_sf[site_id, , drop = FALSE])
 
   buffer_sf <- sf::st_buffer(
     sf::st_transform(field_sf, 25832),

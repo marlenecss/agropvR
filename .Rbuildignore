@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
+^cache$
+^cache_unmasked$
+^remask_cache\.R$
