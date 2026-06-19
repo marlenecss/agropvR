@@ -50,6 +50,8 @@ head(panels)
 
 ## Workflow
 
+<img src="man/figures/agropvRworkflow.png" width="600"/>
+
 ### Step 1 — download pre-computed cache
 
 Downloads all pre-computed `.rds` and `.tif` files from Zenodo. Only
@@ -96,6 +98,8 @@ reference field. The shaded band shows mean ± 1 standard deviation.
 plot_indices(results, site_id = 1)
 ```
 
+<img src="man/figures/Rplot-step4.png" width="600"/>
+
 ### Step 5 — map indices spatially
 
 Maps all three indices side by side for one site and month, alongside a
@@ -107,6 +111,8 @@ pixels.
 ``` r
 map_indices(site_id = 1, month = "2024-04")
 ```
+
+<img src="man/figures/Rplot-step5.png" width="600"/>
 
 ### Step 6 — compare system types
 
@@ -134,6 +140,8 @@ compare_system_types(results_multi)
 # bar chart comparing system types across all three indices
 plot_system_types(results_multi)
 ```
+
+<img src="man/figures/Rplot-step6.png" width="600"/>
 
 ## Optional — collect data for a missing site or month
 
