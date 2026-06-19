@@ -18,6 +18,7 @@
 map_indices <- function(site_id,
                         month,
                         cache_dir = "cache_unmasked",
+                        max_cloud = 30,
                         sites_sf  = agropvR::sites,
                         fields_sf = agropvR::fields,
                         panels_sf = agropvR::panels) {
@@ -41,7 +42,7 @@ map_indices <- function(site_id,
     message("Downloading Sentinel-2 bands for site ", site_id,
             " month ", month, " - this may take a few minutes...")
 
-    scene <- search_sentinel(site_sf, month)
+    scene <- search_sentinel(site_sf, month, max_cloud = max_cloud)
 
     if (is.null(scene)) {
       stop("No suitable scene found for site ", site_id, " month ", month,
@@ -278,9 +279,9 @@ map_indices <- function(site_id,
   p_point_legend <- ggplot2::ggplot() +
     ggplot2::geom_point(
       data    = data.frame(
-        x     = c(1, 1),
-        y     = c(2, 1),
-        label = c(paste("Site", site_id), "Reference field")
+        x     = c(1, 1, 1),
+        y     = c(3, 2, 1),
+        label = c(paste("Site", site_id), "Reference field", "PV panels")
       ),
       mapping     = ggplot2::aes(x = x, y = y, colour = label),
       size        = 3,
@@ -290,6 +291,7 @@ map_indices <- function(site_id,
       name   = NULL,
       values = c(
         "Reference field" = "#3399FF",
+        "PV panels"        = "grey40",
         setNames("red", paste("Site", site_id))
       )
     ) +

@@ -9,6 +9,7 @@ map_indices(
   site_id,
   month,
   cache_dir = "cache_unmasked",
+  max_cloud = 30,
   sites_sf = agropvR::sites,
   fields_sf = agropvR::fields,
   panels_sf = agropvR::panels

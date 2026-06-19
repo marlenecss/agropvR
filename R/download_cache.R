@@ -9,7 +9,7 @@
 #' @return invisible NULL
 #' @export
 download_cache <- function(cache_dir = "cache",
-                           zenodo_id  = c("20705323", "20713763", "20713833")) {
+                           zenodo_id  = c("20713726", "20713763", "20713833")) {
 
   dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 

@@ -116,7 +116,8 @@ Then load and combine results from multiple sites:
 results_multi <- dplyr::bind_rows(
   load_site_results(site_id = 1),
   load_site_results(site_id = 2),
-  load_site_results(site_id = 3)
+  load_site_results(site_id = 12),
+  load_site_results(site_id = 16)
   # add more sites as needed, up to 25
 )
 
