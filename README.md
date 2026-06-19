@@ -8,13 +8,22 @@ impact of agrophotovoltaic facilities on agricultural fields in Bavaria
 and Baden-Württemberg, Germany, using Sentinel-2 satellite imagery.
 
 Agrophotovoltaic facilities combine solar energy production with
-agricultural land use. This package allows users to compare vegetation
-and soil conditions between agrovoltaic sites and paired reference
-fields using three spectral indices:
+agricultural land use. Advantages of photovoltaic arrays include the
+shading they create can lower soil and air temperatures and reduce heat
+stress. Land use can also be optimised by combining the production of
+crops with the generation of energy (Plakman et al., 2022).
 
-- **NDVI** — Normalised Difference Vegetation Index (vegetation health)
-- **NDMI** — Normalised Difference Moisture Index (moisture content)
-- **BSI** — Bare Soil Index (soil exposure)
+## Methods
+
+This package allows users to compare vegetation and soil conditions
+between agrophotovoltaic sites and paired reference fields using three
+spectral indices:
+
+- **NDVI** — Normalised Difference Vegetation Index: used to measure
+  vegetation greenness and health.
+- **NDMI** — Normalised Difference Moisture Index: measures variations
+  in soil and vegetation moisture.
+- **BSI** — Bare Soil Index: measures soil exposure
 
 Pixels covered by photovoltaic panels are masked out before all
 statistics are calculated, so index values reflect the surrounding crop
@@ -207,3 +216,31 @@ the same site number.
   Run `download_cache(cache_dir = "cache_unmasked")` to populate it.
 - Sentinel-2 imagery is accessed via the [Element84 Earth Search STAC
   API](https://earth-search.aws.element84.com/v1).
+
+## Assumptions and Limitations
+
+- Panel reflectance can falsify spectral signature
+- Panel shading effects depend on time of day and can negatively impact
+  scientific results
+- A more long term analysis over years with hydrological similarity
+  would be more representative
+- Other impacts like soil compaction due to heavy machinery during
+  construction can reduce root penetration and crop performance
+- Permanent light reduction of photovoltaic panels can negatively affect
+  crops
+- Mundu et al., 2026 & Muñoz-García et al., 2024
+
+## References
+
+- Mundu, M. M., Sempewo, J. I., Mahoro, G. B., Sankarapandian, V., &
+  Uti, D. E. (2026). Environmental Impacts of Agri‐Photovoltaics Systems
+  on Local Ecosystems. Food and Energy Security, 15(1), e70186.
+  <https://doi.org/10.1002/fes3.70186>
+- Muñoz-García, M.-Á., Fialho, L., Moreda, G. P., & Baptista, F. (2024).
+  Assessment of the impact of utility-scale photovoltaics on the
+  surrounding environment in the Iberian Peninsula. Alternatives for the
+  coexistence with agriculture. Solar Energy, 271, 112446.
+  <https://doi.org/10.1016/j.solener.2024.112446>
+- Plakman, V., Rosier, J., & Van Vliet, J. (2022). Solar park detection
+  from publicly available satellite imagery. GIScience & Remote Sensing,
+  59(1), 462–481. <https://doi.org/10.1080/15481603.2022.2036056>
